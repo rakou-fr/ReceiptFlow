@@ -1,15 +1,23 @@
 import React from "react";
+import Navbar from "../components/landing/Navbar";
+import Hero from "../components/landing/Hero";
+import Features from "../components/landing/Features";
+import Stats from "../components/landing/Stats";
+import CTA from "../components/landing/CTA";
+import SupportButton from "../components/common/SupportButton";
+
 
 const Home = () => {
   return (
-    <div className="max-w-3xl mx-auto text-center">
-      <h1 className="text-3xl font-bold mb-4">
-        Bienvenue
-      </h1>
-
-      <p className="text-gray-600">
-        Ceci est une application React avec pages publiques et privées.
-      </p>
+    <div className="min-h-screen bg-dark-900 text-silver-200">
+      <Navbar />
+      <div className="pt-28">
+        <Hero />
+        <Features />
+        <Stats />
+        <CTA />
+      </div>
+      <SupportButton />
     </div>
   );
 };
