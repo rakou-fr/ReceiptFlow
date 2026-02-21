@@ -8,9 +8,9 @@ const DashboardSidebar = () => {
 
   const menuItems = [
     { label: "Accueil", icon: <Home size={20} />, path: "/dashboard" },
-    { label: "Utilisateurs", icon: <Users size={20} />, path: "/dashboard/users" },
+    { label: "Mon compte", icon: <Users size={20} />, path: "/dashboard/users" },
     { label: "Reçus", icon: <FileText size={20} />, path: "/dashboard/receipts" },
-    { label: "Paramètres", icon: <Settings size={20} />, path: "/dashboard/settings" },
+    { label: "Communauté", icon: <Settings size={20} />, path: "/dashboard/group" },
   ];
 
   const handleLogout = () => {
