@@ -1,14 +1,15 @@
 import React, { useState } from "react";
-import { X, Info } from "lucide-react";
+import { X, FilePlus } from "lucide-react";
 
-const SupportButton = () => {
+const RequestDocumentButton = () => {
   const [open, setOpen] = useState(false);
 
   return (
     <>
+      {/* Bouton flottant (à gauche du support) */}
       <button
         onClick={() => setOpen(true)}
-        className="fixed bottom-6 right-6 z-50
+        className="fixed bottom-6 right-24 z-50
         w-14 h-14 flex items-center justify-center
         rounded-full
         bg-glass-bg backdrop-blur-2xl
@@ -17,7 +18,7 @@ const SupportButton = () => {
         hover:bg-white/10
         transition-all duration-300"
       >
-        <Info size={25} className="text-silver-200" />
+        <FilePlus size={20} className="text-silver-200" />
       </button>
 
       {open && (
@@ -38,7 +39,7 @@ const SupportButton = () => {
           >
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-medium text-silver-100">
-                Support
+                Demande de model de facture, ticket ou mail.
               </h2>
 
               <button
@@ -50,21 +51,35 @@ const SupportButton = () => {
             </div>
 
             <form className="space-y-4">
-              <input
+
+            <input
                 type="text"
-                placeholder="Nom"
+                placeholder="Type de document (ex: facture, ticket, mail)"
                 className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-sm text-silver-100"
               />
 
               <input
-                type="email"
-                placeholder="Email"
+                type="text"
+                placeholder="Marque (ex: Nike, Stussy, Dior)"
                 className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-sm text-silver-100"
+              />
+
+              <input
+                type="number"
+                placeholder="Année ou version du modèle (ex: 2023)"
+                className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-sm text-silver-100"
+              />
+
+              {/* Upload photo */}
+              <input
+                type="file"
+                accept="image/*"
+                className="w-full text-sm text-silver-200"
               />
 
               <textarea
-                rows="4"
-                placeholder="Votre message..."
+                rows="3"
+                placeholder="Détails supplémentaires..."
                 className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-sm text-silver-100 resize-none"
               />
 
@@ -75,7 +90,7 @@ const SupportButton = () => {
                 border border-white/15
                 text-silver-100 transition-all duration-300"
               >
-                Envoyer le ticket
+                Envoyer la demande
               </button>
             </form>
           </div>
@@ -85,4 +100,4 @@ const SupportButton = () => {
   );
 };
 
-export default SupportButton;
+export default RequestDocumentButton;

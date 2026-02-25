@@ -1,0 +1,74 @@
+[
+  {
+    "id": 1,
+    "name": "Apple Store",
+    "image": "/data/factures/Apple.png",
+    "fields": [
+      { "name": "client", "label": "Nom client", "type": "text", "x": 20, "y": 32, "fontSize": 14, "color": "#000", "align": "left" },
+      { "name": "product", "label": "Produit", "type": "text", "x": 20, "y": 40, "fontSize": 14, "color": "#000", "align": "left" },
+      { "name": "price", "label": "Prix", "type": "number", "x": 75, "y": 40, "fontSize": 14, "color": "#000", "align": "right" },
+      { "name": "date", "label": "Date", "type": "date", "x": 75, "y": 22, "fontSize": 13, "color": "#000", "align": "right" },
+      { "name": "orderId", "label": "Numéro commande", "type": "text", "x": 20, "y": 48, "fontSize": 12, "color": "#000", "align": "left" }
+    ]
+  },
+  {
+    "id": 2,
+    "name": "Amazon",
+    "image": "/data/factures/Amazon.png",
+    "fields": [
+      { "name": "client", "label": "Nom client", "type": "text", "x": 20, "y": 30, "fontSize": 14, "color": "#000", "align": "left" },
+      { "name": "product", "label": "Produit", "type": "text", "x": 20, "y": 38, "fontSize": 14, "color": "#000", "align": "left" },
+      { "name": "price", "label": "Prix", "type": "number", "x": 75, "y": 38, "fontSize": 14, "color": "#000", "align": "right" },
+      { "name": "date", "label": "Date", "type": "date", "x": 75, "y": 20, "fontSize": 13, "color": "#000", "align": "right" },
+      { "name": "delivery", "label": "Adresse livraison", "type": "text", "x": 20, "y": 46, "fontSize": 12, "color": "#000", "align": "left" }
+    ]
+  },
+  {
+    "id": 3,
+    "name": "Fnac",
+    "image": "/data/factures/Fnac.png",
+    "fields": [
+      { "name": "client", "label": "Nom client", "type": "text", "x": 20, "y": 30, "fontSize": 14, "color": "#000", "align": "left" },
+      { "name": "product", "label": "Produit", "type": "text", "x": 20, "y": 38, "fontSize": 14, "color": "#000", "align": "left" },
+      { "name": "price", "label": "Prix", "type": "number", "x": 75, "y": 38, "fontSize": 14, "color": "#000", "align": "right" },
+      { "name": "date", "label": "Date", "type": "date", "x": 75, "y": 20, "fontSize": 13, "color": "#000", "align": "right" },
+      { "name": "store", "label": "Magasin", "type": "text", "x": 20, "y": 46, "fontSize": 12, "color": "#000", "align": "left" }
+    ]
+  },
+  {
+    "id": 4,
+    "name": "Nike",
+    "image": "/data/factures/Nike.png",
+    "fields": [
+      { "name": "client", "label": "Nom client", "type": "text", "x": 20, "y": 30, "fontSize": 14, "color": "#000", "align": "left" },
+      { "name": "product", "label": "Produit", "type": "text", "x": 20, "y": 38, "fontSize": 14, "color": "#000", "align": "left" },
+      { "name": "size", "label": "Taille", "type": "text", "x": 20, "y": 46, "fontSize": 14, "color": "#000", "align": "left" },
+      { "name": "price", "label": "Prix", "type": "number", "x": 75, "y": 38, "fontSize": 14, "color": "#000", "align": "right" },
+      { "name": "date", "label": "Date", "type": "date", "x": 75, "y": 20, "fontSize": 13, "color": "#000", "align": "right" }
+    ]
+  },
+    {
+    "id": 3,
+    "name": "Fnac",
+    "image": "/data/factures/Fnac.png",
+    "fields": [
+      { "name": "client", "label": "Nom client", "type": "text", "x": 20, "y": 30, "fontSize": 14, "color": "#000", "align": "left" },
+      { "name": "product", "label": "Produit", "type": "text", "x": 20, "y": 38, "fontSize": 14, "color": "#000", "align": "left" },
+      { "name": "price", "label": "Prix", "type": "number", "x": 75, "y": 38, "fontSize": 14, "color": "#000", "align": "right" },
+      { "name": "date", "label": "Date", "type": "date", "x": 75, "y": 20, "fontSize": 13, "color": "#000", "align": "right" },
+      { "name": "store", "label": "Magasin", "type": "text", "x": 20, "y": 46, "fontSize": 12, "color": "#000", "align": "left" }
+    ]
+  },
+  {
+    "id": 4,
+    "name": "Nike",
+    "image": "/data/factures/Nike.png",
+    "fields": [
+      { "name": "client", "label": "Nom client", "type": "text", "x": 20, "y": 30, "fontSize": 14, "color": "#000", "align": "left" },
+      { "name": "product", "label": "Produit", "type": "text", "x": 20, "y": 38, "fontSize": 14, "color": "#000", "align": "left" },
+      { "name": "size", "label": "Taille", "type": "text", "x": 20, "y": 46, "fontSize": 14, "color": "#000", "align": "left" },
+      { "name": "price", "label": "Prix", "type": "number", "x": 75, "y": 38, "fontSize": 14, "color": "#000", "align": "right" },
+      { "name": "date", "label": "Date", "type": "date", "x": 75, "y": 20, "fontSize": 13, "color": "#000", "align": "right" }
+    ]
+  }
+]

@@ -2,6 +2,7 @@ import React from "react";
 import { Outlet } from "react-router-dom";
 import DashboardSidebar from "../components/dashboard/DashboardSidebar";
 import SupportButton from "../components/common/SupportButton";
+import RequestDocumentButton from "../components/common/RequestDocumentButton";
 
 const Dashboard = () => {
   return (
@@ -12,6 +13,7 @@ const Dashboard = () => {
         <Outlet />
       </div>
 
+      <RequestDocumentButton />
       <SupportButton />
     </div>
   );

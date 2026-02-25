@@ -8,6 +8,8 @@ import Dashboard from "./pages/Dashboard";
 import DashboardHome from "./components/dashboard/DashboardHome";
 import Users from "./pages/dashboard/Users";
 import Receipts from "./pages/dashboard/Receipts";
+import Ticket from "./pages/dashboard/Ticket";
+import Mail from "./pages/dashboard/Mail";
 import Group from "./pages/dashboard/group";
 
 import PrivateRoute from "./components/PrivateRoutes";
@@ -30,6 +32,8 @@ function App() {
         >
           <Route index element={<DashboardHome />} />
           <Route path="users" element={<Users />} />
+          <Route path="ticket" element={<Ticket />} />
+          <Route path="mail" element={<Mail />} />
           <Route path="receipts" element={<Receipts />} />
           <Route path="group" element={<Group />} />
         </Route>

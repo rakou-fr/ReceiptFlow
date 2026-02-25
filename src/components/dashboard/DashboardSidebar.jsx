@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Home, Users, FileText, Settings, LogOut, Menu, X } from "lucide-react";
+import { Home, Users, FileText, Settings, LogOut, Menu, X, Ticket, Mail, Receipt } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const DashboardSidebar = () => {
@@ -8,14 +8,18 @@ const DashboardSidebar = () => {
 
   const menuItems = [
     { label: "Accueil", icon: <Home size={20} />, path: "/dashboard" },
-    { label: "Mon compte", icon: <Users size={20} />, path: "/dashboard/users" },
-    { label: "Reçus", icon: <FileText size={20} />, path: "/dashboard/receipts" },
-    { label: "Communauté", icon: <Settings size={20} />, path: "/dashboard/group" },
+    {},
+    { label: "Facture", icon: <FileText size={20} />, path: "/dashboard/receipts" },
+    // { label: "Ticket de caisse", icon: <Ticket size={20} />, path: "/dashboard/ticket" },
+    // { label: "Mail", icon: <Mail size={20} />, path: "/dashboard/mail" },
+    { label: "Communauté", icon: <Users size={20} />, path: "/dashboard/group" },
+    {},
+    { label: "Mon compte", icon: <Settings size={20} />, path: "/dashboard/users" },
   ];
 
   const handleLogout = () => {
     localStorage.removeItem("user");
-    navigate("/login");
+    navigate("/");
   };
 
   return (
