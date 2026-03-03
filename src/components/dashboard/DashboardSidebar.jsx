@@ -16,13 +16,13 @@ const DashboardSidebar = () => {
     // { label: "Vos niches", icon: <Users size={20} />, path: "/dashboard/niches" },
     // { label: "Vos estimations", icon: <Users size={20} />, path: "/dashboard/estimations" },
     {},
-    { label: "Prévision", icon: <ChartLine size={20} />, path: "/dashboard/forecast" },
+    // { label: "Prévision", icon: <ChartLine size={20} />, path: "/dashboard/forecast" },
     // { label: "Comptabilité", icon: <BookCopy size={20} />, path: "/dashboard/accounting" },
     // { label: "Estimation", icon: <ChartNoAxesColumn size={20} />, path: "/dashboard/estimation" },
     // { label: "Tendance", icon: <ChartCandlestick size={20} />, path: "/dashboard/trend" },
     // { label: "Niche", icon: <View size={20} />, path: "/dashboard/niche" },
-    {},
-    { label: "Mes stocks", icon: <Warehouse size={20} />, path: "/dashboard/stocks" },
+    // {},
+    // { label: "Mes stocks", icon: <Warehouse size={20} />, path: "/dashboard/stocks" },
     { label: "Mon compte", icon: <Settings size={20} />, path: "/dashboard/users" },
   ];
 
