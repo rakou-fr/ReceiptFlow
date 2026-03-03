@@ -123,7 +123,7 @@ const GroupPage = () => {
         {filteredDocs.map((doc) => (
             <div
             key={doc.id}
-            className="bg-glass-bg backdrop-blur-2xl border border-glass-border shadow-lg rounded-2xl p-4 flex flex-col items-center hover:shadow-xl transition-all"
+            className="backdrop-blur-2xl border border-glass-border shadow-lg rounded-2xl p-4 flex flex-col items-center hover:shadow-xl transition-all"
             >
             <img
                 src={doc.image}

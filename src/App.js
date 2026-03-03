@@ -11,6 +11,10 @@ import Receipts from "./pages/dashboard/Receipts";
 import Ticket from "./pages/dashboard/Ticket";
 import Mail from "./pages/dashboard/Mail";
 import Group from "./pages/dashboard/group";
+import Forecast from "./pages/dashboard/Forecast";
+import Stocks from "./pages/dashboard/Stocks";
+// import Accounting from "./pages/dashboard/Accounting";
+// import Estimation from "./pages/dashboard/Estimation";
 
 import PrivateRoute from "./components/PrivateRoutes";
 
@@ -36,6 +40,8 @@ function App() {
           <Route path="mail" element={<Mail />} />
           <Route path="receipts" element={<Receipts />} />
           <Route path="group" element={<Group />} />
+          <Route path="stocks" element={<Stocks />} />
+          <Route path="forecast" element={<Forecast />} />
         </Route>
       </Routes>
     </BrowserRouter>

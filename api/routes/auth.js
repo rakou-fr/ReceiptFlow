@@ -20,21 +20,22 @@ router.post("/register", async (req, res) => {
   res.status(201).json({ message: "Utilisateur créé !" });
 });
 
-// LOGIN
+
 router.post("/login", async (req, res) => {
   const { identifiant, password } = req.body;
-
   const user = await User.findOne({ identifiant });
   if (!user) return res.status(401).json({ message: "Identifiants incorrects" });
 
   const isMatch = await bcrypt.compare(password, user.password);
   if (!isMatch) return res.status(401).json({ message: "Identifiants incorrects" });
 
-  const token = crypto.randomBytes(32).toString("hex");
-  user.token = token;
-  await user.save();
+  // ✅ Ne génère un token que si l'utilisateur n'en a pas encore
+  if (!user.token) {
+    user.token = crypto.randomBytes(32).toString("hex");
+    await user.save();
+  }
 
-  res.json({ token, identifiant: user.identifiant });
+  res.json({ token: user.token, identifiant: user.identifiant });
 });
 
 module.exports = router;

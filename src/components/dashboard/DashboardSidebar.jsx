@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Home, Users, FileText, Settings, LogOut, Menu, X, Ticket, Mail, Receipt } from "lucide-react";
+import { Home, Users, FileText, Settings, LogOut, Menu, View, X, Ticket, Mail, ChartCandlestick, ChartNoAxesColumn, Receipt,LayoutList, ChartLine, Warehouse,BookCopy } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const DashboardSidebar = () => {
@@ -12,8 +12,17 @@ const DashboardSidebar = () => {
     { label: "Facture", icon: <FileText size={20} />, path: "/dashboard/receipts" },
     // { label: "Ticket de caisse", icon: <Ticket size={20} />, path: "/dashboard/ticket" },
     // { label: "Mail", icon: <Mail size={20} />, path: "/dashboard/mail" },
-    { label: "Communauté", icon: <Users size={20} />, path: "/dashboard/group" },
+    { label: "Vos documents", icon: <Users size={20} />, path: "/dashboard/group" },
+    // { label: "Vos niches", icon: <Users size={20} />, path: "/dashboard/niches" },
+    // { label: "Vos estimations", icon: <Users size={20} />, path: "/dashboard/estimations" },
     {},
+    { label: "Prévision", icon: <ChartLine size={20} />, path: "/dashboard/forecast" },
+    // { label: "Comptabilité", icon: <BookCopy size={20} />, path: "/dashboard/accounting" },
+    // { label: "Estimation", icon: <ChartNoAxesColumn size={20} />, path: "/dashboard/estimation" },
+    // { label: "Tendance", icon: <ChartCandlestick size={20} />, path: "/dashboard/trend" },
+    // { label: "Niche", icon: <View size={20} />, path: "/dashboard/niche" },
+    {},
+    { label: "Mes stocks", icon: <Warehouse size={20} />, path: "/dashboard/stocks" },
     { label: "Mon compte", icon: <Settings size={20} />, path: "/dashboard/users" },
   ];
 
