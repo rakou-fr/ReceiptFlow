@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Template Builder — Invoice</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0a0a0f; --surface: rgba(255,255,255,0.05); --border: rgba(255,255,255,0.10);
+    --border-hi: rgba(255,255,255,0.22); --text: rgba(255,255,255,0.88);
+    --muted: rgba(255,255,255,0.35); --accent: rgba(255,255,255,0.15);
+    --sel: rgba(99,179,255,0.25); --sel-b: rgba(99,179,255,0.8);
+    --radius: 16px; --font: 'DM Sans', sans-serif; --mono: 'DM Mono', monospace;
+  }
+  body {
+    font-family: var(--font); background: var(--bg); color: var(--text);
+    height: 100vh; display: grid;
+    grid-template-rows: 56px 1fr; grid-template-columns: 1fr 320px; overflow: hidden;
+  }
+  #topbar {
+    grid-column: 1/-1; display: flex; align-items: center; gap: 16px; padding: 0 24px;
+    border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.03);
+  }
+  #topbar h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.02em; }
+  #topbar .muted { font-size: 12px; color: var(--muted); }
+  .topbar-right { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+
+  #canvas-wrap {
+    position: relative; overflow: auto;
+    background: radial-gradient(ellipse 80% 60% at 20% 30%, rgba(255,255,255,0.025) 0%, transparent 70%), var(--bg);
+    display: flex; align-items: flex-start; justify-content: center; padding: 32px;
+  }
+
+  #empty-overlay {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;
+    pointer-events: none;
+  }
+  #empty-overlay.gone { display: none; }
+  #empty-overlay .icon { font-size: 40px; opacity: 0.15; }
+  #empty-overlay p { color: var(--muted); font-size: 14px; line-height: 1.6; text-align: center; }
+  #empty-overlay strong { color: rgba(255,255,255,0.5); }
+
+  #main-canvas {
+    display: block;
+    border-radius: var(--radius);
+    box-shadow: 0 0 0 1px var(--border);
+    cursor: default;
+  }
+
+  /* Sidebar */
+  #sidebar {
+    border-left: 1px solid var(--border); background: rgba(255,255,255,0.03);
+    display: flex; flex-direction: column; overflow: hidden; height: 100%;
+  }
+  #sidebar-top { flex-shrink: 0; border-bottom: 1px solid var(--border); }
+  #sidebar-scroll { flex: 1; overflow-y: auto; overflow-x: hidden; display: flex; flex-direction: column; }
+  #sidebar-scroll::-webkit-scrollbar { width: 4px; }
+  #sidebar-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+  .s-section { padding: 16px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+  .s-section h3 { font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+  .hint { font-size: 11px; color: var(--muted); margin-bottom: 8px; }
+
+  #fields-list { padding: 8px; flex-shrink: 0; }
+  .fi { display: flex; align-items: center; gap: 8px; padding: 10px 12px; border-radius: 10px; border: 1px solid transparent; cursor: pointer; transition: all 0.15s; margin-bottom: 4px; }
+  .fi:hover { background: var(--surface); border-color: var(--border); }
+  .fi.active { background: var(--sel); border-color: var(--sel-b); }
+  .fi-name { font-size: 13px; font-weight: 500; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .fi-type { font-size: 10px; font-family: var(--mono); color: var(--muted); background: var(--surface); padding: 2px 6px; border-radius: 4px; flex-shrink: 0; }
+  .fi-del { width: 20px; height: 20px; border-radius: 5px; background: transparent; border: none; color: var(--muted); cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; transition: all 0.15s; opacity: 0; flex-shrink: 0; }
+  .fi:hover .fi-del { opacity: 1; }
+  .fi-del:hover { background: rgba(255,80,80,0.2); color: #ff6b6b; }
+
+  #inspector { padding: 16px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+  #inspector h3 { font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+  #inspector.empty { display: flex; align-items: center; justify-content: center; min-height: 120px; }
+  #inspector.empty p { font-size: 12px; color: var(--muted); text-align: center; }
+
+  .fr { margin-bottom: 10px; }
+  .fr label { display: block; font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+  .fr2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+  .fr2 .fr { margin-bottom: 0; }
+  input[type=text], input[type=number], select {
+    width: 100%; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; padding: 7px 10px; font-family: var(--font);
+    font-size: 13px; color: var(--text); outline: none; transition: border-color 0.15s;
+  }
+  input:focus, select:focus { border-color: var(--border-hi); }
+  select option { background: #1a1a2e; }
+  textarea { width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 7px 10px; font-family: var(--font); font-size: 13px; color: var(--text); outline: none; resize: vertical; min-height: 52px; line-height: 1.5; }
+  textarea:focus { border-color: var(--border-hi); }
+  input[type=color] { width: 100%; height: 36px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; cursor: pointer; padding: 3px 6px; }
+  .rrow { display: flex; align-items: center; gap: 8px; }
+  .rrow input[type=range] { flex: 1; -webkit-appearance: none; height: 4px; border-radius: 2px; background: var(--border); border: none; padding: 0; cursor: pointer; outline: none; }
+  .rrow input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: rgba(255,255,255,0.85); border: 2px solid rgba(255,255,255,0.3); cursor: pointer; }
+  .rval { font-size: 11px; font-family: var(--mono); color: var(--muted); min-width: 32px; text-align: right; }
+
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 9px 16px; border-radius: 10px; font-family: var(--font); font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.15s; border: 1px solid var(--border); }
+  .btn-g { background: var(--surface); color: var(--text); }
+  .btn-g:hover { background: var(--accent); border-color: var(--border-hi); }
+  .btn-p { background: rgba(255,255,255,0.12); color: var(--text); border-color: var(--border-hi); }
+  .btn-p:hover { background: rgba(255,255,255,0.2); }
+  .btn-sm { padding: 6px 12px; font-size: 12px; border-radius: 8px; }
+  .btn-full { width: 100%; }
+  .btn-danger { background: rgba(255,80,80,0.08); color: #ff6b6b; border-color: rgba(255,80,80,0.2); }
+  .btn-danger:hover { background: rgba(255,80,80,0.18); }
+
+  #tmeta { padding: 12px 16px; display: flex; flex-direction: column; gap: 8px; }
+  #tmeta h3 { font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 2px; }
+  #sidebar-footer { padding: 12px 16px; flex-shrink: 0; border-top: 1px solid var(--border); margin-top: auto; }
+
+  #font-scroll { max-height: 110px; overflow-y: auto; margin-top: 8px; border: 1px solid var(--border); border-radius: 8px; padding: 4px; }
+  .fpi { display: flex; align-items: center; justify-content: space-between; padding: 6px 10px; border-radius: 6px; margin-bottom: 2px; }
+  .fpn { font-size: 11px; color: var(--muted); font-family: var(--mono); flex: 1; }
+  .fps { font-size: 15px; color: var(--text); }
+
+  .afrow { display: flex; gap: 6px; margin-bottom: 4px; }
+  .afrow input { flex: 1; }
+
+  #placing-banner {
+    position: fixed; top: 70px; left: 50%; transform: translateX(-50%);
+    background: rgba(99,179,255,0.15); border: 1px solid rgba(99,179,255,0.4);
+    border-radius: 10px; padding: 8px 18px; font-size: 13px; color: rgba(180,220,255,0.9);
+    z-index: 100; pointer-events: none; display: none;
+  }
+  #placing-banner.show { display: block; }
+
+  #toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: rgba(255,255,255,0.1); border: 1px solid var(--border-hi); border-radius: 12px; padding: 10px 20px; font-size: 13px; color: var(--text); transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1); z-index: 9999; pointer-events: none; }
+  #toast.show { transform: translateX(-50%) translateY(0); }
+
+  #json-modal { display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.7); align-items: center; justify-content: center; }
+  #json-modal.open { display: flex; }
+  .mc { background: #12121a; border: 1px solid var(--border-hi); border-radius: 20px; padding: 24px; width: 90%; max-width: 640px; max-height: 80vh; display: flex; flex-direction: column; gap: 16px; }
+  .mh { display: flex; align-items: center; justify-content: space-between; }
+  .mh h2 { font-size: 16px; font-weight: 600; }
+  #json-out { flex: 1; overflow-y: auto; background: rgba(0,0,0,0.4); border: 1px solid var(--border); border-radius: 12px; padding: 16px; font-family: var(--mono); font-size: 12px; color: rgba(180,220,255,0.85); white-space: pre; line-height: 1.7; max-height: 50vh; }
+  .mf { display: flex; gap: 8px; justify-content: flex-end; }
+</style>
+</head>
+<body>
+
+<div id="topbar">
+  <h1>Template Builder</h1><span class="muted">·</span>
+  <span class="muted" id="status">Aucune image chargée</span>
+  <div class="topbar-right">
+    <label class="btn btn-g btn-sm" style="cursor:pointer;">
+      📁 Ouvrir image
+      <input type="file" id="img-input" accept="image/*" style="display:none" />
+    </label>
+    <button class="btn btn-p btn-sm" onclick="openJson()">⬇ Exporter JSON</button>
+  </div>
+</div>
+
+<div id="canvas-wrap">
+  <div id="empty-overlay">
+    <div class="icon">🖼</div>
+    <p><strong>Glissez une image ici</strong><br/>ou utilisez « Ouvrir image » en haut<br/><span style="font-size:11px;opacity:.5;">PNG, JPG, WEBP acceptés</span></p>
+  </div>
+  <canvas id="main-canvas" width="1" height="1"></canvas>
+</div>
+
+<div id="sidebar">
+  <div id="sidebar-top">
+    <div id="tmeta">
+      <h3>Modèle</h3>
+      <div class="fr" style="margin:0"><label>Nom</label><input type="text" id="tpl-name" placeholder="Facture Moderne" /></div>
+      <div class="fr" style="margin:0;margin-top:8px"><label>ID</label><input type="text" id="tpl-id" placeholder="modern-001" /></div>
+    </div>
+  </div>
+  <div id="sidebar-scroll">
+    <div class="s-section">
+      <h3>Ajouter un champ</h3>
+      <p class="hint">Entrez un nom puis cliquez sur l'image</p>
+      <div class="afrow">
+        <input type="text" id="fn" placeholder="Nom (ex: total)" />
+        <select id="ft" style="width:86px">
+          <option value="text">text</option><option value="number">number</option>
+          <option value="date">date</option><option value="email">email</option>
+        </select>
+      </div>
+      <div class="afrow"><input type="text" id="fl" placeholder="Label affiché" /></div>
+      <button class="btn btn-g btn-full btn-sm" onclick="startPlace()">＋ Placer sur l'image</button>
+    </div>
+    <div class="s-section">
+      <h3>Polices locales</h3>
+      <label class="btn btn-g btn-full btn-sm" style="cursor:pointer;margin-bottom:8px;">
+        📂 Charger des polices
+        <input type="file" id="font-input" accept=".ttf,.otf,.woff,.woff2" multiple style="display:none" />
+      </label>
+      <div id="font-scroll"><div style="font-size:11px;color:var(--muted);padding:8px;text-align:center;">Aucune police chargée</div></div>
+    </div>
+    <div class="s-section" style="padding-bottom:8px;">
+      <h3>Champs <span id="fcount" style="opacity:.4;font-weight:400;text-transform:none;letter-spacing:0;">(0)</span></h3>
+      <div id="fields-list"></div>
+    </div>
+    <div id="inspector" class="empty"><p>Sélectionnez un champ<br/>pour l'éditer</p></div>
+    <div id="sidebar-footer">
+      <button class="btn btn-g btn-full btn-sm" onclick="clearAll()">🗑 Tout effacer</button>
+    </div>
+  </div>
+</div>
+
+<div id="placing-banner">🎯 Cliquez pour placer — Échap pour annuler</div>
+
+<div id="json-modal">
+  <div class="mc">
+    <div class="mh"><h2>Export JSON</h2><button class="btn btn-g btn-sm" onclick="closeJson()">✕ Fermer</button></div>
+    <p style="font-size:12px;color:var(--muted);">Copiez dans votre <code style="background:rgba(255,255,255,0.08);padding:1px 5px;border-radius:4px;">Models.json</code></p>
+    <pre id="json-out"></pre>
+    <div class="mf">
+      <button class="btn btn-g btn-sm" onclick="copyJson()">📋 Copier</button>
+      <button class="btn btn-p btn-sm" onclick="dlJson()">⬇ Télécharger</button>
+    </div>
+  </div>
+</div>
+<div id="toast"></div>
+
+<script>
+/*
+  SYSTÈME DE COORDONNÉES
+  ──────────────────────
+  field.x, field.y, field.fontSize = px sur l'image NATURELLE
+
+  Affichage canvas builder :
+    scale   = DISPLAY_W / naturalW
+    drawX   = field.x * scale
+    drawY   = field.y * scale
+    drawFs  = field.fontSize * scale
+
+  Affichage InvoicePage React :
+    scale   = img.renderedWidth / naturalW
+    left    = field.x * scale   (px)
+    top     = field.y * scale   (px)
+    fontSize= field.fontSize * scale
+*/
+
+const DISPLAY_W = 700;
+
+let fields     = [];
+let selId      = null;
+let placing    = false;
+let naturalW   = 0;
+let naturalH   = 0;
+let displayH   = 0;
+let bgImage    = null;   // HTMLImageElement
+let loadedFonts = [];
+let imgDataURL = null;
+
+// Drag state
+let dragging   = false;
+let dragId     = null;
+let dragOffX   = 0;
+let dragOffY   = 0;
+
+const canvas   = document.getElementById('main-canvas');
+const ctx      = canvas.getContext('2d');
+
+// ── Image loading ────────────────────────────────────────────
+document.getElementById('img-input').addEventListener('change', function() {
+  const file = this.files[0];
+  if (!file) return;
+  readAndLoadImage(file);
+  this.value = '';
+});
+
+const wrap = document.getElementById('canvas-wrap');
+wrap.addEventListener('dragover', e => e.preventDefault());
+wrap.addEventListener('drop', e => {
+  e.preventDefault();
+  const file = e.dataTransfer.files[0];
+  if (file && file.type.startsWith('image/')) readAndLoadImage(file);
+});
+
+function readAndLoadImage(file) {
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const dataURL = e.target.result;
+    imgDataURL    = dataURL;
+    const img     = new Image();
+    img.onload    = function() {
+      naturalW  = img.naturalWidth;
+      naturalH  = img.naturalHeight;
+      displayH  = Math.round(DISPLAY_W * (naturalH / naturalW));
+      bgImage   = img;
+
+      canvas.width  = DISPLAY_W;
+      canvas.height = displayH;
+
+      document.getElementById('empty-overlay').classList.add('gone');
+      document.getElementById('status').textContent = file.name + ' — ' + naturalW + '×' + naturalH + 'px';
+
+      if (!document.getElementById('tpl-id').value)
+        document.getElementById('tpl-id').value = 'tpl-' + Date.now().toString(36);
+
+      redraw();
+    };
+    img.src = dataURL;
+  };
+  reader.readAsDataURL(file);
+}
+
+// ── Redraw canvas ────────────────────────────────────────────
+function redraw() {
+  if (!bgImage) return;
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.drawImage(bgImage, 0, 0, DISPLAY_W, displayH);
+
+  const scale = DISPLAY_W / naturalW;
+
+  fields.forEach(f => {
+    const x  = f.x * scale;
+    const y  = f.y * scale;
+    const fs = Math.max(6, Math.round(f.fontSize * scale));
+    const ff = f.fontFamily || 'Arial';
+    const fw = f.fontWeight === 'bold' ? 'bold' : 'normal';
+
+    ctx.save();
+    ctx.globalAlpha = f.opacity ?? 1;
+    ctx.font        = `${fw} ${fs}px ${ff}, Arial`;
+    ctx.fillStyle   = f.color || '#000';
+    ctx.textBaseline = 'middle';
+    ctx.textAlign    = f.align || 'left';
+
+    // Multi-line
+    const lines = (f.label || f.name).split('\n');
+    lines.forEach((line, i) => {
+      ctx.fillText(line, x, y + (i - (lines.length - 1) / 2) * fs * 1.3);
+    });
+
+    // Selection highlight
+    if (f.id === selId) {
+      const tw  = ctx.measureText(lines.reduce((a,b) => a.length > b.length ? a : b)).width;
+      const th  = fs * 1.3 * lines.length;
+      let bx = x;
+      if (f.align === 'center') bx = x - tw / 2;
+      if (f.align === 'right')  bx = x - tw;
+
+      ctx.restore();
+      ctx.save();
+      ctx.strokeStyle = 'rgba(99,179,255,0.9)';
+      ctx.lineWidth   = 1.5;
+      ctx.setLineDash([4, 3]);
+      ctx.strokeRect(bx - 4, y - th / 2 - 4, tw + 8, th + 8);
+
+      // Badge nom
+      ctx.setLineDash([]);
+      ctx.fillStyle = 'rgba(99,179,255,0.85)';
+      ctx.font      = '10px monospace';
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'bottom';
+      const bw = ctx.measureText(f.name).width + 8;
+      ctx.fillRect(bx - 4, y - th / 2 - 22, bw, 16);
+      ctx.fillStyle = '#000';
+      ctx.fillText(f.name, bx - 4 + 4, y - th / 2 - 6);
+    }
+
+    ctx.restore();
+  });
+}
+
+// ── Canvas mouse events ──────────────────────────────────────
+canvas.addEventListener('mousedown', e => {
+  if (!bgImage) return;
+  const { cx, cy } = canvasXY(e);
+
+  if (placing) return; // click handled by mouseup
+
+  // Check hit on a field (reverse order = top first)
+  const scale = DISPLAY_W / naturalW;
+  for (let i = fields.length - 1; i >= 0; i--) {
+    const f  = fields[i];
+    const fx = f.x * scale;
+    const fy = f.y * scale;
+    const fs = Math.max(6, Math.round(f.fontSize * scale));
+
+    ctx.save();
+    ctx.font = `${f.fontWeight === 'bold' ? 'bold' : 'normal'} ${fs}px ${f.fontFamily || 'Arial'}, Arial`;
+    const lines = (f.label || f.name).split('\n');
+    const tw = ctx.measureText(lines.reduce((a,b) => a.length > b.length ? a : b)).width;
+    const th = fs * 1.3 * lines.length;
+    ctx.restore();
+
+    let bx = fx;
+    if (f.align === 'center') bx = fx - tw / 2;
+    if (f.align === 'right')  bx = fx - tw;
+
+    const hitX = bx - 8;
+    const hitY = fy - th / 2 - 8;
+    const hitW = tw + 16;
+    const hitH = th + 16;
+
+    if (cx >= hitX && cx <= hitX + hitW && cy >= hitY && cy <= hitY + hitH) {
+      selId    = f.id;
+      dragging = true;
+      dragId   = f.id;
+      dragOffX = cx - fx;
+      dragOffY = cy - fy;
+      renderInspector();
+      renderList();
+      redraw();
+      return;
+    }
+  }
+
+  // Clic sur le vide → désélectionner
+  selId = null;
+  renderInspector();
+  renderList();
+  redraw();
+});
+
+canvas.addEventListener('mousemove', e => {
+  if (!bgImage) return;
+  const { cx, cy } = canvasXY(e);
+
+  if (dragging && dragId) {
+    const f = fields.find(f => f.id === dragId);
+    if (f) {
+      const scale   = naturalW / DISPLAY_W;
+      f.x = Math.round((cx - dragOffX) * scale);
+      f.y = Math.round((cy - dragOffY) * scale);
+      f.x = Math.max(0, f.x);
+      f.y = Math.max(0, f.y);
+      // Sync inspector XY inputs
+      const xi = document.getElementById('inp-x');
+      const yi = document.getElementById('inp-y');
+      if (xi) xi.value = f.x;
+      if (yi) yi.value = f.y;
+      redraw();
+    }
+    return;
+  }
+
+  // Cursor hint
+  if (placing) { canvas.style.cursor = 'crosshair'; return; }
+  const scale = DISPLAY_W / naturalW;
+  let hit = false;
+  for (const f of fields) {
+    const fx = f.x * scale;
+    const fy = f.y * scale;
+    const fs = Math.max(6, Math.round(f.fontSize * scale));
+    ctx.save();
+    ctx.font = `${f.fontWeight === 'bold' ? 'bold' : 'normal'} ${fs}px ${f.fontFamily || 'Arial'}, Arial`;
+    const lines = (f.label || f.name).split('\n');
+    const tw = ctx.measureText(lines.reduce((a,b) => a.length > b.length ? a : b)).width;
+    const th = fs * 1.3 * lines.length;
+    ctx.restore();
+    let bx = fx;
+    if (f.align === 'center') bx = fx - tw / 2;
+    if (f.align === 'right')  bx = fx - tw;
+    if (cx >= bx - 8 && cx <= bx + tw + 8 && cy >= fy - th / 2 - 8 && cy <= fy + th / 2 + 8) { hit = true; break; }
+  }
+  canvas.style.cursor = hit ? 'grab' : 'default';
+});
+
+canvas.addEventListener('mouseup', e => {
+  if (dragging) { dragging = false; dragId = null; return; }
+
+  if (placing && bgImage) {
+    const { cx, cy } = canvasXY(e);
+    const scale = naturalW / DISPLAY_W;
+    const name  = document.getElementById('fn').value.trim();
+    const type  = document.getElementById('ft').value;
+    const label = document.getElementById('fl').value.trim() || name;
+
+    const f = {
+      id:         'f_' + Date.now(),
+      name:       name.replace(/\s+/g, '_').toLowerCase(),
+      label, type,
+      x:          Math.round(cx * scale),
+      y:          Math.round(cy * scale),
+      fontSize:   28,
+      color:      '#000000',
+      fontWeight: 'normal',
+      fontFamily: '',
+      align:      'left',
+      opacity:    1,
+    };
+    fields.push(f);
+    document.getElementById('fn').value = '';
+    document.getElementById('fl').value = '';
+    stopPlace();
+    selId = f.id;
+    renderInspector();
+    renderList();
+    redraw();
+    toast('✓ Champ « ' + f.label + ' » placé');
+  }
+});
+
+window.addEventListener('mouseup', () => { if (dragging) { dragging = false; dragId = null; } });
+
+function canvasXY(e) {
+  const r = canvas.getBoundingClientRect();
+  return { cx: e.clientX - r.left, cy: e.clientY - r.top };
+}
+
+// ── Placing mode ─────────────────────────────────────────────
+function startPlace() {
+  if (!bgImage) { toast('⚠️ Chargez une image d\'abord'); return; }
+  const name = document.getElementById('fn').value.trim();
+  if (!name)  { toast('⚠️ Entrez un nom de champ'); return; }
+  placing = true;
+  canvas.style.cursor = 'crosshair';
+  document.getElementById('placing-banner').classList.add('show');
+}
+function stopPlace() {
+  placing = false;
+  canvas.style.cursor = 'default';
+  document.getElementById('placing-banner').classList.remove('show');
+}
+
+// ── Field list ───────────────────────────────────────────────
+function renderList() {
+  const el = document.getElementById('fields-list');
+  el.innerHTML = '';
+  document.getElementById('fcount').textContent = '(' + fields.length + ')';
+  fields.forEach(f => {
+    const d = document.createElement('div');
+    d.className = 'fi' + (f.id === selId ? ' active' : '');
+    d.innerHTML = `<span class="fi-name">${f.label || f.name}</span><span class="fi-type">${f.type}</span><button class="fi-del">✕</button>`;
+    d.querySelector('.fi-del').addEventListener('click', ev => { ev.stopPropagation(); delField(f.id); });
+    d.addEventListener('click', () => { selId = f.id; renderInspector(); renderList(); redraw(); });
+    el.appendChild(d);
+  });
+}
+
+// ── Inspector ────────────────────────────────────────────────
+function renderInspector() {
+  const el = document.getElementById('inspector');
+  const f  = fields.find(f => f.id === selId);
+  if (!f) { el.className = 'empty'; el.innerHTML = '<p>Sélectionnez un champ<br/>pour l\'éditer</p>'; return; }
+
+  const fontOpts = loadedFonts.map(fo =>
+    `<option value="${fo.family}" ${f.fontFamily === fo.family ? 'selected' : ''}>${fo.name}</option>`).join('');
+  const opPct = Math.round((f.opacity ?? 1) * 100);
+
+  el.className = '';
+  el.innerHTML = `
+    <h3>Propriétés — <span style="opacity:.5;text-transform:none;letter-spacing:0;">${f.name}</span></h3>
+    <div class="fr"><label>Nom (clé JSON)</label><input type="text" id="inp-name" value="${f.name}" /></div>
+    <div class="fr"><label>Label <span style="opacity:.4;font-size:10px;">↵ = retour ligne</span></label><textarea id="inp-label" rows="2"></textarea></div>
+    <div class="fr2">
+      <div class="fr"><label>Type</label><select id="inp-type">
+        <option value="text"   ${f.type==='text'  ?'selected':''}>text</option>
+        <option value="number" ${f.type==='number'?'selected':''}>number</option>
+        <option value="date"   ${f.type==='date'  ?'selected':''}>date</option>
+        <option value="email"  ${f.type==='email' ?'selected':''}>email</option>
+      </select></div>
+      <div class="fr"><label>Alignement</label><select id="inp-align">
+        <option value="left"   ${f.align==='left'  ?'selected':''}>Gauche</option>
+        <option value="center" ${f.align==='center'?'selected':''}>Centre</option>
+        <option value="right"  ${f.align==='right' ?'selected':''}>Droite</option>
+      </select></div>
+    </div>
+    <div class="fr"><label>Police</label><select id="inp-font" ${!loadedFonts.length?'disabled':''}>
+      <option value="">— Défaut —</option>${fontOpts}
+    </select></div>
+    <div class="fr2">
+      <div class="fr"><label>Taille (px natifs)</label><input type="number" id="inp-fs" value="${f.fontSize}" min="4" max="500" /></div>
+      <div class="fr"><label>Graisse</label><select id="inp-fw">
+        <option value="normal" ${f.fontWeight!=='bold'?'selected':''}>Normal</option>
+        <option value="bold"   ${f.fontWeight==='bold' ?'selected':''}>Bold</option>
+      </select></div>
+    </div>
+    <div class="fr2">
+      <div class="fr"><label>Couleur</label><input type="color" id="inp-col" value="${f.color}" /></div>
+      <div class="fr"><label>Opacité</label>
+        <div class="rrow"><input type="range" id="inp-op" min="0" max="1" step="0.01" value="${f.opacity??1}" /><span class="rval" id="op-v">${opPct}%</span></div>
+      </div>
+    </div>
+    <div class="fr2">
+      <div class="fr"><label>X (px natifs)</label><input type="number" id="inp-x" value="${f.x}" /></div>
+      <div class="fr"><label>Y (px natifs)</label><input type="number" id="inp-y" value="${f.y}" /></div>
+    </div>
+    <button class="btn btn-danger btn-full btn-sm" onclick="delField('${f.id}')">🗑 Supprimer</button>`;
+
+  document.getElementById('inp-label').value = f.label || '';
+
+  const bind = (id, prop, xf) => document.getElementById(id)?.addEventListener('input', e => {
+    f[prop] = xf ? xf(e.target.value) : e.target.value; redraw();
+  });
+  bind('inp-name', 'name');
+  bind('inp-type', 'type');
+  bind('inp-align','align');
+  bind('inp-font', 'fontFamily');
+  bind('inp-fs',   'fontSize',   v => Math.max(4, parseInt(v) || 28));
+  bind('inp-fw',   'fontWeight');
+  bind('inp-col',  'color');
+  bind('inp-x',    'x',          v => parseFloat(v) || 0);
+  bind('inp-y',    'y',          v => parseFloat(v) || 0);
+  document.getElementById('inp-label')?.addEventListener('input',   e => { f.label = e.target.value; redraw(); });
+  document.getElementById('inp-label')?.addEventListener('keydown', e => e.stopPropagation());
+  document.getElementById('inp-op')?.addEventListener('input', e => {
+    f.opacity = parseFloat(e.target.value);
+    document.getElementById('op-v').textContent = Math.round(f.opacity * 100) + '%';
+    redraw();
+  });
+}
+
+// ── Delete / clear ───────────────────────────────────────────
+function delField(id) {
+  fields = fields.filter(f => f.id !== id);
+  if (selId === id) selId = null;
+  renderInspector(); renderList(); redraw();
+}
+function clearAll() {
+  if (!confirm('Supprimer tous les champs ?')) return;
+  fields = []; selId = null;
+  renderInspector(); renderList(); redraw();
+}
+
+// ── Fonts ────────────────────────────────────────────────────
+document.getElementById('font-input').addEventListener('change', async function() {
+  const files = Array.from(this.files).filter(f => /\.(ttf|otf|woff2?)$/i.test(f.name));
+  for (const file of files) {
+    const name = file.name.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' ');
+    if (loadedFonts.find(f => f.name === name)) continue;
+    try {
+      const ff = new FontFace(name, await file.arrayBuffer());
+      document.fonts.add(await ff.load());
+      loadedFonts.push({ name, family: name });
+    } catch(e) { console.warn(e); }
+  }
+  const c = document.getElementById('font-scroll');
+  c.innerHTML = loadedFonts.length
+    ? loadedFonts.map(f => `<div class="fpi"><span class="fpn">${f.name}</span><span class="fps" style="font-family:'${f.family}'">Aa</span></div>`).join('')
+    : '<div style="font-size:11px;color:var(--muted);padding:8px;text-align:center;">Aucune police</div>';
+  toast('✓ ' + files.length + ' police(s) chargée(s)');
+  if (selId) renderInspector();
+  this.value = '';
+});
+
+// ── JSON ─────────────────────────────────────────────────────
+function buildJSON() {
+  const name = document.getElementById('tpl-name').value.trim() || 'Mon Template';
+  const id   = document.getElementById('tpl-id').value.trim()   || 'tpl-' + Date.now().toString(36);
+  return JSON.stringify({
+    id, name,
+    naturalWidth:  naturalW,
+    naturalHeight: naturalH,
+    image: '/templates/' + id + '.png',
+    fields: fields.map(({ id: _, ...rest }) => {
+      const out = { ...rest };
+      if (!out.fontFamily) delete out.fontFamily;
+      return out;
+    }),
+  }, null, 2);
+}
+function openJson()  { if (!fields.length) { toast('⚠️ Ajoutez au moins un champ'); return; } document.getElementById('json-out').textContent = buildJSON(); document.getElementById('json-modal').classList.add('open'); }
+function closeJson() { document.getElementById('json-modal').classList.remove('open'); }
+function copyJson()  { navigator.clipboard.writeText(buildJSON()).then(() => toast('✓ Copié !')); }
+function dlJson()    {
+  const id = document.getElementById('tpl-id').value.trim() || 'template';
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([buildJSON()], { type: 'application/json' }));
+  a.download = id + '.json'; a.click(); toast('✓ Téléchargé');
+}
+
+// ── Keyboard ─────────────────────────────────────────────────
+document.addEventListener('keydown', e => {
+  const tag = document.activeElement.tagName;
+  if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+  if ((e.key === 'Delete' || e.key === 'Backspace') && selId) delField(selId);
+  if (e.key === 'Escape') stopPlace();
+});
+document.getElementById('json-modal').addEventListener('click', e => {
+  if (e.target === document.getElementById('json-modal')) closeJson();
+});
+
+// ── Toast ────────────────────────────────────────────────────
+let _tt;
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(_tt); _tt = setTimeout(() => t.classList.remove('show'), 2600);
+}
+</script>
+</body>
+</html>

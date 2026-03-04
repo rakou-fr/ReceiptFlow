@@ -70,5 +70,134 @@
       { "name": "price", "label": "Prix", "type": "number", "x": 75, "y": 38, "fontSize": 14, "color": "#000", "align": "right" },
       { "name": "date", "label": "Date", "type": "date", "x": 75, "y": 20, "fontSize": 13, "color": "#000", "align": "right" }
     ]
-  }
+  },
+{
+  "id": "AmiParis",
+  "name": "AmiParis",
+  "naturalWidth": 1654,
+  "naturalHeight": 2339,
+  "image": "/data/factures/AmiParis.png",
+  "fields": [
+    {
+      "name": "numero_de_boite_postale",
+      "label": "01480",
+      "type": "text",
+      "x": 864,
+      "y": 966,
+      "fontSize": 24,
+      "color": "#000000",
+      "fontWeight": "normal",
+      "align": "left",
+      "opacity": 1
+    },
+    {
+      "name": "numero_facture",
+      "label": "67 459",
+      "type": "text",
+      "x": 796,
+      "y": 999,
+      "fontSize": 24,
+      "color": "#000000",
+      "fontWeight": "normal",
+      "align": "left",
+      "opacity": 1
+    },
+    {
+      "name": "description",
+      "label": "sweat black/white ss22",
+      "type": "text",
+      "x": 562,
+      "y": 1154,
+      "fontSize": 24,
+      "color": "#000000",
+      "fontWeight": "normal",
+      "align": "left",
+      "opacity": 1
+    },
+    {
+      "name": "quantite",
+      "label": "1",
+      "type": "text",
+      "x": 945,
+      "y": 1154,
+      "fontSize": 24,
+      "color": "#000000",
+      "fontWeight": "normal",
+      "align": "left",
+      "opacity": 1
+    },
+    {
+      "name": "prix_a",
+      "label": "264,00€",
+      "type": "text",
+      "x": 1153,
+      "y": 1151,
+      "fontSize": 24,
+      "color": "#000000",
+      "fontWeight": "normal",
+      "align": "left",
+      "opacity": 1
+    },
+    {
+      "name": "cout",
+      "label": "264,00€",
+      "type": "text",
+      "x": 1333,
+      "y": 1147,
+      "fontSize": 24,
+      "color": "#000000",
+      "fontWeight": "normal",
+      "align": "left",
+      "opacity": 1
+    },
+    {
+      "name": "sous_total",
+      "label": "264,00€",
+      "type": "text",
+      "x": 1333,
+      "y": 1263,
+      "fontSize": 24,
+      "color": "#000000",
+      "fontWeight": "normal",
+      "align": "left",
+      "opacity": 1
+    },
+    {
+      "name": "taxe",
+      "label": "66,00€",
+      "type": "text",
+      "x": 1333,
+      "y": 1347,
+      "fontSize": 24,
+      "color": "#000000",
+      "fontWeight": "normal",
+      "align": "left",
+      "opacity": 1
+    },
+    {
+      "name": "total",
+      "label": "330,00€",
+      "type": "text",
+      "x": 1335,
+      "y": 1433,
+      "fontSize": 24,
+      "color": "#000000",
+      "fontWeight": "normal",
+      "align": "left",
+      "opacity": 1
+    },
+    {
+      "name": "date",
+      "label": "21/10/2022",
+      "type": "text",
+      "x": 627,
+      "y": 900,
+      "fontSize": 24,
+      "color": "#000000",
+      "fontWeight": "normal",
+      "align": "left",
+      "opacity": 1
+    }
+  ]
+}
 ]
